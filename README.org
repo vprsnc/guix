@@ -20,14 +20,27 @@ Claude Code is the only tool that does not come from Guix (npm, see below).
 
 * Install
 ** 1. Boot media
-Use the *nonguix install image* (nonguix GitLab → Releases): it has the
-full kernel + firmware, so the X1's Intel Wi-Fi works in the installer.
-The plain Guix ISO (linux-libre) would not see the Wi-Fi card.
+Use the *nonguix install image*: it has the full kernel + firmware, so
+the X1's Intel Wi-Fi works in the installer. The plain Guix ISO
+(linux-libre) would not see the Wi-Fi card.
+
+nonguix has no real releases (it's a rolling channel; only an old
+=v1.4.0= from 2022 sits on the Releases page). That image is stale and
+doesn't put nonguix into =/etc/guix/channels.scm=, so build a fresh one
+from =master= with the Guix on the current machine:
+#+begin_src sh
+git clone https://gitlab.com/nonguix/nonguix ~/src/nonguix
+guix system image --image-type=iso9660 \
+  --substitute-urls='https://ci.guix.gnu.org https://bordeaux.guix.gnu.org https://substitutes.nonguix.org' \
+  ~/src/nonguix/nongnu/system/install.scm
+#+end_src
+It prints a =/gnu/store/…-image.iso= path. Authorize the nonguix key
+first (see step 4), or the kernel gets compiled locally (hours).
 
 The flash drive already has Ventoy, so just copy the ISO next to the
 CachyOS one (no =dd=):
 #+begin_src sh
-cp nonguix-*.iso /run/media/$USER/Ventoy/
+cp /gnu/store/…-image.iso /run/media/$USER/Ventoy/nonguix.iso
 sync
 #+end_src
 
