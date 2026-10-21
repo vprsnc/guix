@@ -33,7 +33,7 @@
     ;; files & projects
     "emacs-dired-hacks" "emacs-dired-hide-dotfiles"
     "emacs-all-the-icons-dired" "emacs-projectile" "emacs-magit"
-    "emacs-envrc" "emacs-vterm" "emacs-bash-completion"
+    "emacs-envrc" "emacs-bash-completion"   ;ghostel: :vc in config.org
     ;; org & notes
     "emacs-org-contrib" "emacs-org-superstar" "emacs-org-present"
     "emacs-org-roam" "emacs-org-pomodoro" "emacs-denote"

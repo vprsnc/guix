@@ -139,7 +139,9 @@ tail ~/.local/state/log/kmonad.log
   npm install -g squint-cljs
   #+end_src
 - Packages Guix lacks are fetched on first Emacs start via =:vc=
-  (=claude-code-ide=, Chinese tools). =jieba= needs a Rust dynamic
+  (=claude-code-ide=, =ghostel=, Chinese tools). Ghostel downloads its
+  pre-built native module on first =M-x ghostel= into
+  =~/.config/emacs/ghostel/=. =jieba= needs a Rust dynamic
   module; if it fails, =guix shell rust rust-cargo= and build it, or drop it.
 
 * VPN (AmneziaWG)

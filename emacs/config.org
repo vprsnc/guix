@@ -692,6 +692,8 @@ PLACEHOLDER: replace =YOU@riseup.net= / =YOUR NAME= here and
        :rev
        :newest)
   :bind ("C-c C-'" . claude-code-ide-menu)
+  :custom
+  (claude-code-ide-terminal-backend 'ghostel)
   :config
   (claude-code-ide-emacs-tools-setup)
   )
@@ -1078,16 +1080,26 @@ under point instead."
       (async-shell-command command output-buffer)
       (message "Rendering %s... started" file-path)))
 #+end_src
-** vterm project root
+** ghostel
+Terminal for everything (shells, Claude Code). Not in Guix, so the Lisp
+comes from GitHub via =:vc=; the native module is a pre-built download
+kept outside the package tree so a reinstall doesn't drop it.
 #+begin_src emacs-lisp
-(defun my/vterm-project-root ()
-  "Open vterm in another frame at the current project root."
+(use-package ghostel
+  :vc (:url "https://github.com/dakra/ghostel"
+       :lisp-dir "lisp"
+       :rev :newest)
+  :custom
+  (ghostel-module-auto-install 'download)
+  (ghostel-module-directory (locate-user-emacs-file "ghostel/")))
+#+end_src
+** ghostel project root
+#+begin_src emacs-lisp
+(defun my/ghostel-project-root ()
+  "Open ghostel at the current project root."
   (interactive)
-  (let* ((project (project-current t))
-         (project-root (project-root project)))
-    (select-frame (make-frame))
-    (let ((default-directory project-root))
-      (vterm))))
+  (let ((default-directory (project-root (project-current t))))
+    (ghostel)))
 #+end_src
 * advices
 Advices are something similar to the hookns, they are run after functions.
@@ -1164,7 +1176,7 @@ It is a good example from [[https://emacsrocks.com/e12.html][Emacsrocks]] though
 (require 'general)
 
 (general-define-key
- "C-x p V" 'my/vterm-project-root)
+ "C-x p V" 'my/ghostel-project-root)
 
 (general-define-key
  "C-x C-\\" 'set-input-method)
@@ -1206,7 +1218,6 @@ UPD /4/18/25/: now has lots of consult
  "C-c b" 'previous-buffer
  "C-c f" 'next-buffer
  "C-c om" 'mu4e
- "C-c ov" 'vterm-other-window
  "C-c oi" 'ibuffer
  "C-c og" 'guix
  "C-c od" 'docker
