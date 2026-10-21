@@ -1,0 +1,205 @@
+#+title: ThinkPad X1 — Guix + Guix Home + EXWM
+
+* Layout
+| File                | What                                                    |
+|---------------------+---------------------------------------------------------|
+| =channels.scm=        | Guix + nonguix (kernel/firmware for Intel Wi-Fi)        |
+| =system.scm=          | Minimal OS: boot, disks, user, groups, udev, GDM        |
+| =home.scm=            | Packages, dotfiles, user daemons (Shepherd)             |
+| =emacs/config.org=    | Emacs config; tangled by Guix into init/early-init/exwm |
+| =kmonad/thinkpad.kbd= | Home-row mods, run by a Home Shepherd service           |
+
+What runs where:
+- System (root Shepherd): NetworkManager, GDM, elogind, TLP, thermald,
+  uinput module, udev rules for kmonad and brightnessctl.
+- Home (user Shepherd, =herd status=): kmonad, syncthing, pipewire,
+  wireplumber, dbus.
+- Emacs: EXWM is the window manager, started from the "EXWM" GDM session.
+
+Claude Code is the only tool that does not come from Guix (npm, see below).
+
+* Install
+** 1. Boot media
+Use the *nonguix install image* (nonguix GitLab → Releases): it has the
+full kernel + firmware, so the X1's Intel Wi-Fi works in the installer.
+The plain Guix ISO (linux-libre) would not see the Wi-Fi card.
+
+The flash drive already has Ventoy, so just copy the ISO next to the
+CachyOS one (no =dd=):
+#+begin_src sh
+cp nonguix-*.iso /run/media/$USER/Ventoy/
+sync
+#+end_src
+
+In BIOS (F1): disable Secure Boot (Guix doesn't support it). Boot with
+F12, pick the nonguix ISO in the Ventoy menu.
+
+If boot stops with the installer unable to find its root file system
+(Guile REPL or "no such device"), boot the ISO again and choose
+*GRUB2 mode* in Ventoy's submenu. If that fails too, use *memdisk mode*:
+it loads the whole ISO into RAM, which is fine with 8 GB.
+
+** 2. Graphical installer
+- Keyboard: the layout you'll type the disk passphrase with.
+- Partitioning: guided, whole disk, *encrypted*. Make sure you get swap
+  (≥ 4 GB): =guix pull= on 8 GB RAM can run out of memory without it.
+- Desktop environment: *none*.
+- Network service: NetworkManager.
+- Install, reboot, log in on the TTY.
+
+** 3. Get this repo onto the machine
+USB stick or =git clone= into =~/dotfiles=. The paths below assume that.
+
+Connect to Wi-Fi first if needed: =nmtui=.
+
+** 4. Channels
+#+begin_src sh
+mkdir -p ~/.config/guix
+cp ~/dotfiles/channels.scm ~/.config/guix/channels.scm
+guix pull            # first time: long. If it starts building the kernel, see below.
+hash guix
+#+end_src
+
+nonguix substitutes are only trusted after step 5. The first pull is
+fine without them; the first =system reconfigure= can use them via:
+#+begin_src sh
+sudo guix system reconfigure ~/dotfiles/system.scm \
+  --substitute-urls='https://ci.guix.gnu.org https://bordeaux.guix.gnu.org https://substitutes.nonguix.org'
+#+end_src
+together with authorizing the key once by hand:
+#+begin_src sh
+echo '(public-key (ecc (curve Ed25519) (q #C1FD53E5D4CE971933EC50C9F307AE2171A2D3B52C804642A7A35F84F3A4EA98#)))' > nonguix.pub
+sudo guix archive --authorize < nonguix.pub
+#+end_src
+Without this, Guix compiles the Linux kernel locally (hours).
+
+** 5. System
+Open =/etc/config.scm= (written by the installer) next to =system.scm=
+and copy into =system.scm=:
+- =mapped-devices=, =file-systems=, =swap-devices= (verbatim)
+- =host-name=, =timezone=, =locale=
+Then check the two =;CHECK= lines (user name, keyboard layout).
+
+#+begin_src sh
+sudo guix system reconfigure ~/dotfiles/system.scm   # sudo keeps your pulled guix
+reboot
+#+end_src
+Reboot matters: new kernel, and the =input=/=uinput= groups only apply
+after re-login.
+
+** 6. Home
+#+begin_src sh
+guix home reconfigure ~/dotfiles/home.scm
+#+end_src
+If it stops on an unknown package, =guix search emacs-foo= and fix or
+delete that line in =home.scm=. Packages I'm least sure Guix has:
+=emacs-doric-themes=, =emacs-denote-journal=, =emacs-agent-shell=,
+=emacs-fb2-reader=, =emacs-mentor=,
+=emacs-flycheck-clj-kondo=, =uv=. Dropping one only costs that
+feature; =use-package= logs the error and Emacs keeps starting.
+
+Log out; in GDM pick the *EXWM* session (gear icon), log in.
+
+** 7. After first login
+#+begin_src sh
+herd status                # kmonad, syncthing, pipewire should be "started"
+tail ~/.local/state/log/kmonad.log
+#+end_src
+
+- Syncthing: open http://localhost:8384 in qutebrowser, add devices
+  and folders there (it keeps its own config in =~/.local/state/syncthing=).
+- Claude Code:
+  #+begin_src sh
+  npm install -g @anthropic-ai/claude-code
+  claude
+  #+end_src
+  If the installed =claude= is a prebuilt native binary that fails with
+  "No such file or directory" (it wants =/lib64/ld-linux-x86-64.so.2=),
+  run it in an FHS container instead:
+  #+begin_src sh
+  guix shell --container --emulate-fhs --network \
+    --share=$HOME --preserve='^TERM$' \
+    node bash coreutils git ripgrep -- claude
+  #+end_src
+- Packages Guix lacks are fetched on first Emacs start via =:vc=
+  (=claude-code-ide=, Chinese tools). =jieba= needs a Rust dynamic
+  module; if it fails, =guix shell rust rust-cargo= and build it, or drop it.
+
+* Mail (mu4e)
+Fetch = =mbsync= started by mu4e's timer (every 10 min), send = Emacs
+=smtpmail=, password = pass via =auth-source-pass=. No mail daemons.
+
+Once the new Riseup account exists:
+1. Replace the placeholders: =%mail-address= in =home.scm=;
+   =my/mail-address= and =YOUR NAME= in =emacs/config.org= (mu4e section).
+   Then =guix home reconfigure ~/dotfiles/home.scm=.
+2. GPG key + password store (skip the first two if you bring a key):
+   #+begin_src sh
+   gpg --full-generate-key
+   pass init YOUR-KEY-ID
+   pass insert -m mail.riseup.net
+   #+end_src
+   Entry content (first line is the password):
+   #+begin_example
+   the-password
+   user: YOU@riseup.net
+   #+end_example
+3. First sync and index:
+   #+begin_src sh
+   mkdir -p ~/Mail/riseup
+   mbsync -a
+   mu init --maildir=~/Mail --my-address=YOU@riseup.net
+   mu index
+   #+end_src
+4. Log out/in (or =M-: (mu4e t)=). From then on mu4e starts in the
+   background with the EXWM session and syncs on its own; =M-x mu4e=,
+   =U= to sync now.
+
+Check after the first sync: the folder names in =~/Mail/riseup/= should
+match =Sent=, =Drafts=, =Trash= in the mu4e config. Rename them in
+the config if Riseup uses different names. =Archive= is created on first refile.
+
+The gpg passphrase is asked in the minibuffer before each sync if not
+cached (8 h cache). If a GTK prompt appears instead, mbsync asked first.
+That's harmless.
+
+* EXWM keys
+| Key            | Action                                 |
+|----------------+----------------------------------------|
+| =s-0= … =s-9=      | Go to workspace N                      |
+| =s-w=            | Pick workspace                         |
+| =s-&=            | Run a program (e.g. =qutebrowser=, =mpv=)  |
+| =s-R=            | Reset EXWM (back to line mode)         |
+| =C-c C-q=        | Next key goes straight to the X window |
+| Volume/bright. | Laptop function keys                   |
+Super is the =s= home-row hold (kmonad).
+
+* Day to day
+| Task                                 | Command                                         |
+|--------------------------------------+-------------------------------------------------|
+| Change Emacs config / packages / dotfiles | edit, then =guix home reconfigure ~/dotfiles/home.scm= |
+| Change system                        | =sudo guix system reconfigure ~/dotfiles/system.scm= |
+| Update everything                    | =guix pull=, then both reconfigures             |
+| Undo a bad change                    | =guix home roll-back= / =sudo guix system roll-back= (or older GRUB entry) |
+| Restart a user daemon                | =herd restart kmonad=                           |
+| Free disk                            | =guix home delete-generations 1m && sudo guix system delete-generations 1m && guix gc= |
+| Try a package without installing     | =guix shell foo=                                |
+
+Emacs config is tangled by Guix, so edits to =emacs/config.org= take
+effect only after =guix home reconfigure=. To test quickly, eval the
+block in place first.
+
+* Things I changed in the Emacs config
+- Removed straight.el, MELPA, el-patch, exec-path-from-shell; all
+  =:ensure t= dropped (packages come from Guix).
+- =custom-file= → =~/.config/emacs/custom.el= (init.el is read-only).
+- Fixed hooks that never fired: =:hook (org-mode-hook . …)= becomes
+  =org-mode-hook-hook=; same for dired, csv, superstar.
+- =dired-hide-dotfiles= waited for =evil-collection=, which is not
+  installed, so it never loaded.
+- Added =(require 'general)= before the keybindings, Guix-built
+  =pdf-tools=, deferred =mu4e=, =epg-pinentry-mode 'loopback= for pass.
+- =treesit-auto= no longer compiles grammars; they come from Guix.
+- =cyrillic-dvorak.el= loads only if present. Put it in =emacs/= and
+  uncomment its line in =home.scm=.
+- New =* exwm= section → =~/.exwm=.
