@@ -175,15 +175,15 @@ That's harmless.
 Super is the =s= home-row hold (kmonad).
 
 * Day to day
-| Task                                 | Command                                         |
-|--------------------------------------+-------------------------------------------------|
-| Change Emacs config / packages / dotfiles | edit, then =guix home reconfigure ~/dotfiles/home.scm= |
-| Change system                        | =sudo guix system reconfigure ~/dotfiles/system.scm= |
-| Update everything                    | =guix pull=, then both reconfigures             |
-| Undo a bad change                    | =guix home roll-back= / =sudo guix system roll-back= (or older GRUB entry) |
-| Restart a user daemon                | =herd restart kmonad=                           |
-| Free disk                            | =guix home delete-generations 1m && sudo guix system delete-generations 1m && guix gc= |
-| Try a package without installing     | =guix shell foo=                                |
+| Task                                      | Command                                                                              |
+|-------------------------------------------+--------------------------------------------------------------------------------------|
+| Change Emacs config / packages / dotfiles | edit, then =guix home reconfigure ~/dotfiles/home.scm=                                 |
+| Change system                             | =sudo guix system reconfigure ~/dotfiles/system.scm=                                   |
+| Update everything                         | =guix pull=, then both reconfigures                                                    |
+| Undo a bad change                         | =guix home roll-back= / =sudo guix system roll-back= (or older GRUB entry)               |
+| Restart a user daemon                     | =herd restart kmonad=                                                                  |
+| Free disk                                 | =guix home delete-generations 1m && sudo guix system delete-generations 1m && guix gc= |
+| Try a package without installing          | =guix shell foo=                                                                       |
 
 Emacs config is tangled by Guix, so edits to =emacs/config.org= take
 effect only after =guix home reconfigure=. To test quickly, eval the
