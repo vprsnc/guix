@@ -113,9 +113,12 @@
       (guix-service-type
        config => (guix-configuration
                   (inherit config)
+                  ;; No ci.guix.gnu.org: blocked from Russia, and every
+                  ;; lookup would wait for its timeout. bordeaux has
+                  ;; the same packages.
                   (substitute-urls
-                   (cons "https://substitutes.nonguix.org"
-                         %default-substitute-urls))
+                   '("https://bordeaux.guix.gnu.org"
+                     "https://substitutes.nonguix.org"))
                   (authorized-keys
                    (cons (plain-file "nonguix.pub"
                                      "(public-key (ecc (curve Ed25519) (q #C1FD53E5D4CE971933EC50C9F307AE2171A2D3B52C804642A7A35F84F3A4EA98#)))")

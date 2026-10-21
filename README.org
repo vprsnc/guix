@@ -29,9 +29,9 @@ nonguix has no real releases (it's a rolling channel; only an old
 doesn't put nonguix into =/etc/guix/channels.scm=, so build a fresh one
 from =master= with the Guix on the current machine:
 #+begin_src sh
-git clone https://gitlab.com/nonguix/nonguix ~/src/nonguix
+git clone https://github.com/nonguix/nonguix ~/src/nonguix   # GitLab is blocked in RU
 guix system image --image-type=iso9660 \
-  --substitute-urls='https://ci.guix.gnu.org https://bordeaux.guix.gnu.org https://substitutes.nonguix.org' \
+  --substitute-urls='https://bordeaux.guix.gnu.org https://substitutes.nonguix.org' \
   ~/src/nonguix/nongnu/system/install.scm
 #+end_src
 It prints a =/gnu/store/…-image.iso= path. Authorize the nonguix key
@@ -69,15 +69,18 @@ Connect to Wi-Fi first if needed: =nmtui=.
 #+begin_src sh
 mkdir -p ~/.config/guix
 cp ~/dotfiles/channels.scm ~/.config/guix/channels.scm
-guix pull            # first time: long. If it starts building the kernel, see below.
+guix pull --substitute-urls='https://bordeaux.guix.gnu.org'   # first time: long
 hash guix
 #+end_src
+ci.guix.gnu.org (in the installed system's defaults until step 5) is
+blocked from Russia, so name bordeaux explicitly; otherwise every lookup
+waits for ci to time out. =system.scm= drops ci for good.
 
 nonguix substitutes are only trusted after step 5. The first pull is
 fine without them; the first =system reconfigure= can use them via:
 #+begin_src sh
 sudo guix system reconfigure ~/dotfiles/system.scm \
-  --substitute-urls='https://ci.guix.gnu.org https://bordeaux.guix.gnu.org https://substitutes.nonguix.org'
+  --substitute-urls='https://bordeaux.guix.gnu.org https://substitutes.nonguix.org'
 #+end_src
 together with authorizing the key once by hand:
 #+begin_src sh
