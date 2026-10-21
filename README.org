@@ -134,9 +134,33 @@ tail ~/.local/state/log/kmonad.log
     --share=$HOME --preserve='^TERM$' \
     node bash coreutils git ripgrep -- claude
   #+end_src
+- squint (ClojureScript → JS), also from npm:
+  #+begin_src sh
+  npm install -g squint-cljs
+  #+end_src
 - Packages Guix lacks are fetched on first Emacs start via =:vc=
   (=claude-code-ide=, Chinese tools). =jieba= needs a Rust dynamic
   module; if it fails, =guix shell rust rust-cargo= and build it, or drop it.
+
+* VPN (AmneziaWG)
+No Amnezia GUI on Guix; the tunnel runs with =awg-quick= +
+=amneziawg-go= as a system Shepherd service (=system.scm=).
+
+1. In the Amnezia app (on CachyOS): share the server connection as an
+   *AmneziaWG native config* and save it as =awg0.conf=.
+2. On the X1 (the file holds the private key, so keep it out of this repo):
+   #+begin_src sh
+   sudo install -Dm600 awg0.conf /etc/amnezia/amneziawg/awg0.conf
+   #+end_src
+3. Use it:
+   #+begin_src sh
+   sudo herd start amneziawg     # up
+   sudo awg show                 # handshake / traffic
+   sudo herd stop amneziawg      # down
+   #+end_src
+
+It isn't started at boot. If the config has a =DNS= line, =awg-quick=
+sets it via resolvconf; NetworkManager may overwrite it on reconnect.
 
 * Mail (mu4e)
 Fetch = =mbsync= started by mu4e's timer (every 10 min), send = Emacs
@@ -173,8 +197,9 @@ match =Sent=, =Drafts=, =Trash= in the mu4e config. Rename them in
 the config if Riseup uses different names. =Archive= is created on first refile.
 
 The gpg passphrase is asked in the minibuffer before each sync if not
-cached (8 h cache). If a GTK prompt appears instead, mbsync asked first.
-That's harmless.
+cached (8 h cache). All gpg prompts go through =pinentry-emacs=, so
+pass, mbsync and git ask in the minibuffer too; on a bare TTY (no
+Emacs) they ask in the terminal.
 
 * EXWM keys
 | Key            | Action                                 |

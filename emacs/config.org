@@ -129,6 +129,8 @@ commands started from a project buffer (including cider-jack-in) use the Guix JD
 ** password-store
 #+begin_src emacs-lisp
 (setq epg-pinentry-mode 'loopback)  ; ask for the GPG passphrase in the minibuffer
+(use-package pinentry  ; same for gpg started outside Emacs (pass, mbsync, git)
+  :config (pinentry-start))
 (use-package password-store)
 (use-package pass)
 (auth-source-pass-enable)  ; pass entries as auth-source (mail, gptel keys)

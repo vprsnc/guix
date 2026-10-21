@@ -52,7 +52,8 @@
     ;; ai
     "emacs-gptel" "emacs-agent-shell"
     ;; misc
-    "emacs-password-store" "emacs-pass" "emacs-mentor" "emacs-telega"
+    "emacs-password-store" "emacs-pass" "emacs-pinentry"
+    "emacs-mentor" "emacs-telega"
     "mu"))
 
 (define %tree-sitter-grammars
@@ -62,7 +63,9 @@
 
 (define %tools
   '("git" "mpv" "imagemagick" "qutebrowser"
-    "uv" "python" "node"                ;node is only for Claude Code
+    "uv" "python" "node"                ;node: Claude Code and squint (npm)
+    ;; clojure; babashka, clj-kondo and clojure-lsp come from nonguix
+    "openjdk:jdk" "clojure-tools" "babashka" "clj-kondo" "clojure-lsp"
     "ripgrep" "fd" "direnv" "password-store" "gnupg" "isync"
     "wireplumber" "brightnessctl"
     "font-fira-code" "font-google-noto" "font-google-noto-sans-cjk"
@@ -173,15 +176,17 @@ save-position-on-quit=yes
             `((".exwm" ,(file-append %emacs-config "/exwm.el"))
               (".mbsyncrc" ,%mbsyncrc)))
 
-   ;; Emacs asks for the passphrase itself (loopback); the long cache
-   ;; lets mbsync reuse it. The GTK pinentry is only a fallback.
+   ;; Every passphrase prompt (pass, mbsync, git, gpg in a shell) goes to
+   ;; the Emacs minibuffer via pinentry.el; falls back to the terminal
+   ;; when Emacs isn't running. The long cache lets mbsync reuse it.
    (service home-gpg-agent-service-type
             (home-gpg-agent-configuration
              (pinentry-program
-              (file-append (specification->package "pinentry-gtk2")
-                           "/bin/pinentry-gtk-2"))
+              (file-append (specification->package "pinentry-emacs")
+                           "/bin/pinentry-emacs"))
              (default-cache-ttl 28800)
-             (max-cache-ttl 28800)))
+             (max-cache-ttl 28800)
+             (extra-content "allow-emacs-pinentry\n")))
 
    (service home-dbus-service-type)
    (service home-pipewire-service-type)
