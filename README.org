@@ -4,6 +4,7 @@
 | File                | What                                                    |
 |---------------------+---------------------------------------------------------|
 | =channels.scm=        | Guix + nonguix (kernel/firmware for Intel Wi-Fi)        |
+| =installer.scm=       | nonguix install ISO without hosts blocked in Russia     |
 | =system.scm=          | Minimal OS: boot, disks, user, groups, udev, GDM        |
 | =home.scm=            | Packages, dotfiles, user daemons (Shepherd)             |
 | =emacs/config.org=    | Emacs config; tangled by Guix into init/early-init/exwm |
@@ -27,12 +28,14 @@ the X1's Intel Wi-Fi works in the installer. The plain Guix ISO
 nonguix has no real releases (it's a rolling channel; only an old
 =v1.4.0= from 2022 sits on the Releases page). That image is stale and
 doesn't put nonguix into =/etc/guix/channels.scm=, so build a fresh one
-from =master= with the Guix on the current machine:
+from =master= with the Guix on the current machine. =installer.scm=
+wraps nonguix's installer so it skips hosts blocked from Russia
+(substitutes from bordeaux + nonguix, nonguix channel from GitHub):
 #+begin_src sh
 git clone https://github.com/nonguix/nonguix ~/src/nonguix   # GitLab is blocked in RU
-guix system image --image-type=iso9660 \
+guix system image --image-type=iso9660 -L ~/src/nonguix \
   --substitute-urls='https://bordeaux.guix.gnu.org https://substitutes.nonguix.org' \
-  ~/src/nonguix/nongnu/system/install.scm
+  ~/dotfiles/installer.scm
 #+end_src
 It prints a =/gnu/store/…-image.iso= path. Authorize the nonguix key
 first (see step 4), or the kernel gets compiled locally (hours).
