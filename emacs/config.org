@@ -153,6 +153,15 @@ commands started from a project buffer (including cider-jack-in) use the Guix JD
   (mood-line-mode)
   (setq mood-line-glyph-alist mood-line-glyphs-fira-code))
 #+end_src
+** battery
+EXWM has no status bar, so show charge in the mode-line.
+#+begin_src emacs-lisp
+(use-package battery
+  :custom
+  (battery-mode-line-format "%b%p%% ")
+  :config
+  (display-battery-mode))
+#+end_src
 
 ** paredit
 #+begin_src emacs-lisp

@@ -69,7 +69,17 @@
 
   (services
    (append
-    (list (service tlp-service-type)
+    (list (service tlp-service-type
+                   (tlp-configuration
+                    ;; Battery: favour efficiency over speed.
+                    (cpu-energy-perf-policy-on-ac "balance_performance")
+                    (cpu-energy-perf-policy-on-bat "power")
+                    (cpu-boost-on-ac? #t)
+                    (cpu-boost-on-bat? #f)
+                    ;; Lifespan: hold charge between 75-80% (ThinkPad
+                    ;; firmware). `sudo tlp fullcharge` before a trip.
+                    (start-charge-thresh-bat0 75)
+                    (stop-charge-thresh-bat0 80)))
           (service thermald-service-type)
           (service kernel-module-loader-service-type '("uinput"))
           (udev-rules-service 'kmonad kmonad)
