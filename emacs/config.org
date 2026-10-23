@@ -1524,6 +1524,23 @@ Emacs movement keys inside X programs (browser text fields etc.).
         ([?\C-s] . [?\C-f])))
 #+end_src
 
+** input method
+Emacs input methods (=C-\=) inside X programs via EXWM's XIM server.
+The variables must be set before any program starts; everything run
+through =my/exwm-run= inherits them.
+#+begin_src emacs-lisp :tangle exwm.el
+(require 'exwm-xim)
+(setenv "XMODIFIERS" "@im=exwm-xim")
+(setenv "GTK_IM_MODULE" "xim")
+(setenv "QT_IM_MODULE" "xim")
+(setenv "CLUTTER_IM_MODULE" "xim")
+;; Let C-\ reach Emacs from char-mode X windows.
+(push ?\C-\\ exwm-input-prefix-keys)
+(if (fboundp 'exwm-xim-mode)
+    (exwm-xim-mode 1)
+  (exwm-xim-enable))
+#+end_src
+
 ** session
 #+begin_src emacs-lisp :tangle exwm.el
 (setq browse-url-browser-function #'browse-url-generic
