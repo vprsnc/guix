@@ -18,10 +18,5 @@ sed -i -e "s/00000000-0000-0000-0000-000000000000/$luks/" \
        -e "s/\"0000-0000\"/\"$efi\"/" system.scm
 grep -n -E "uuid" system.scm
 
-curl -sf -m 10 "$relay/nix-cache-info" >/dev/null || {
-    echo "Relay $relay not reachable; start it on CachyOS first." >&2
-    exit 1
-}
-
 sudo guix system reconfigure system.scm \
      --substitute-urls="https://bordeaux.guix.gnu.org $relay"
