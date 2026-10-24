@@ -12,14 +12,19 @@
 set -e
 c=/mnt/etc/config.scm
 
-# Kill the stuck installer's container process without letting it clean
-# up (that would unmount /mnt), then get guix-daemon back into our
-# mount namespace.
+# Kill the stuck installer's container process; the installer then
+# unmounts the target, so (re)open and mount it below.  Restart
+# guix-daemon so it runs in our mount namespace.
 p=$(pgrep -o -f installer-real || true)
 if [ -n "$p" ]; then
     pkill -9 -P "$p" -f installer-real || true
+    sleep 3
 fi
 herd restart guix-daemon
+
+[ -e /dev/mapper/cryptroot ] || cryptsetup open /dev/nvme0n1p2 cryptroot
+mountpoint -q /mnt || mount /dev/mapper/cryptroot /mnt
+mkdir -p /mnt/boot/efi
 
 if ! grep -q nongnu "$c"; then
     sed -i 's/^(use-modules (gnu))$/(use-modules (gnu) (nongnu packages linux) (nongnu system linux-initrd))/' "$c"
