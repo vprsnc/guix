@@ -23,7 +23,7 @@
   '("emacs"
     ;; ui
     "emacs-modus-themes" "emacs-ef-themes" "emacs-doric-themes"
-    "emacs-mood-line" "emacs-all-the-icons" "emacs-breadcrumb"
+    "emacs-mood-line" "emacs-all-the-icons"   ;breadcrumb: :vc
     "emacs-hide-mode-line" "emacs-visual-fill-column"
     ;; completion & editing
     "emacs-vertico" "emacs-marginalia" "emacs-consult" "emacs-corfu"
@@ -31,7 +31,7 @@
     "emacs-multiple-cursors" "emacs-move-text" "emacs-paredit"
     "emacs-smartparens" "emacs-rainbow-delimiters" "emacs-treesit-auto"
     ;; files & projects
-    "emacs-dired-hacks" "emacs-dired-hide-dotfiles"
+    "emacs-dired-hacks"                     ;dired-hide-dotfiles: :vc
     "emacs-all-the-icons-dired" "emacs-projectile" "emacs-magit"
     "emacs-envrc" "emacs-bash-completion"   ;ghostel: :vc in config.org
     ;; org & notes
@@ -41,13 +41,13 @@
     ;; guix
     "emacs-guix" "emacs-geiser" "emacs-geiser-guile"
     ;; dev
-    "emacs-ess" "emacs-polymode" "emacs-poly-r" "emacs-poly-markdown"
+    "emacs-ess" "emacs-polymode" "emacs-poly-r" "emacs-polymode-markdown"
     "emacs-markdown-mode" "emacs-clojure-mode" "emacs-cider"
     "emacs-flycheck" "emacs-flycheck-clj-kondo" "emacs-docker"
     "emacs-yaml-mode" "emacs-web-mode" "emacs-restclient"
     "emacs-simple-httpd" "emacs-csv-mode"
     ;; reading
-    "emacs-pdf-tools" "emacs-djvu" "emacs-nov-el"
+    "emacs-pdf-tools" "emacs-djvu" "emacs-nov"
     "emacs-fb2-reader"
     ;; ai
     "emacs-gptel" "emacs-agent-shell"
@@ -69,7 +69,7 @@
     "ripgrep" "fd" "direnv" "password-store" "gnupg" "isync"
     "wireplumber" "brightnessctl"
     "font-fira-code" "font-google-noto" "font-google-noto-sans-cjk"
-    "font-gdouros-symbola"))
+    "font-google-noto-emoji"))
 
 ;;; Emacs: tangle emacs/config.org at build time
 

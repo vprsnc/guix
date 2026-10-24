@@ -74,7 +74,7 @@ fetched with =use-package :vc=.
 
 ** color emojis
 #+begin_src emacs-lisp
-(set-fontset-font t 'unicode "Symbola" nil 'append)
+(set-fontset-font t 'emoji "Noto Color Emoji" nil 'prepend)
 #+end_src
 
 * package management
@@ -255,8 +255,9 @@ EXWM has no status bar, so show charge in the mode-line.
 
 ** breadcrump
 #+begin_src emacs-lisp
-(use-package breadcrumb)
-(add-hook 'prog-mode-hook 'breadcrumb-mode)
+(use-package breadcrumb
+  :vc (:url "https://github.com/joaotavora/breadcrumb")
+  :hook (prog-mode . breadcrumb-mode))
 #+end_src
 
 ** denote
@@ -505,6 +506,7 @@ Those are at the end not to break any of the prev settings
 *** hide/show dot files
 #+begin_src emacs-lisp
 (use-package dired-hide-dotfiles
+  :vc (:url "https://github.com/mattiasb/dired-hide-dotfiles")
   :hook (dired-mode . dired-hide-dotfiles-mode))
 #+end_src
 

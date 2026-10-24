@@ -61,7 +61,28 @@ it loads the whole ISO into RAM, which is fine with 8 GB.
   (≥ 4 GB): =guix pull= on 8 GB RAM can run out of memory without it.
 - Desktop environment: *none*.
 - Network service: NetworkManager.
+- On the "Configuration file" page press *Edit*. The installer only
+  offers Linux-libre, which has no Wi-Fi on the X1; switch the
+  installed system to the nonguix kernel (this ISO's Guix includes
+  nonguix, so these modules resolve). Extend =use-modules=:
+  #+begin_src scheme
+  (use-modules (gnu)
+               (nongnu packages linux)
+               (nongnu system linux-initrd))
+  #+end_src
+  and add inside =(operating-system …)=:
+  #+begin_src scheme
+  (kernel linux)
+  (initrd microcode-initrd)
+  (firmware (list linux-firmware))
+  #+end_src
+  Save, continue. The kernel comes from substitutes.nonguix.org
+  (already trusted by this ISO), so nothing compiles.
 - Install, reboot, log in on the TTY.
+
+If the edit was skipped or fails, the system boots without Wi-Fi until
+step 5. Then use USB tethering from a phone for steps 3-5: its driver
+is free and NetworkManager picks it up.
 
 ** 3. Get this repo onto the machine
 USB stick or =git clone= into =~/dotfiles=. The paths below assume that.
@@ -110,12 +131,10 @@ after re-login.
 #+begin_src sh
 guix home reconfigure ~/dotfiles/home.scm
 #+end_src
-If it stops on an unknown package, =guix search emacs-foo= and fix or
-delete that line in =home.scm=. Packages I'm least sure Guix has:
-=emacs-doric-themes=, =emacs-denote-journal=, =emacs-agent-shell=,
-=emacs-fb2-reader=, =emacs-mentor=,
-=emacs-flycheck-clj-kondo=, =uv=. Dropping one only costs that
-feature; =use-package= logs the error and Emacs keeps starting.
+If it stops on an unknown package (packages get renamed upstream),
+=guix search emacs-foo= and fix or delete that line in =home.scm=.
+Dropping one only costs that feature; =use-package= logs the error and
+Emacs keeps starting.
 
 Log out; in GDM pick the *EXWM* session (gear icon), log in.
 
@@ -145,7 +164,8 @@ tail ~/.local/state/log/kmonad.log
   npm install -g squint-cljs
   #+end_src
 - Packages Guix lacks are fetched on first Emacs start via =:vc=
-  (=claude-code-ide=, =ghostel=, Chinese tools). Ghostel downloads its
+  (=claude-code-ide=, =ghostel=, =breadcrumb=, =dired-hide-dotfiles=,
+  Chinese tools). Ghostel downloads its
   pre-built native module on first =M-x ghostel= into
   =~/.config/emacs/ghostel/=. =jieba= needs a Rust dynamic
   module; if it fails, =guix shell rust rust-cargo= and build it, or drop it.
