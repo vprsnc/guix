@@ -5,17 +5,17 @@
 |---------------------+---------------------------------------------------------|
 | =channels.scm=        | Guix + nonguix (kernel/firmware for Intel Wi-Fi)        |
 | =installer.scm=       | nonguix install ISO without hosts blocked in Russia     |
-| =system.scm=          | Minimal OS: boot, disks, user, groups, udev, GDM        |
+| =system.scm=          | Minimal OS: boot, disks, user, groups, udev, LightDM     |
 | =home.scm=            | Packages, dotfiles, user daemons (Shepherd)             |
 | =emacs/config.org=    | Emacs config; tangled by Guix into init/early-init/exwm |
 | =kmonad/thinkpad.kbd= | Home-row mods, run by a Home Shepherd service           |
 
 What runs where:
-- System (root Shepherd): NetworkManager, GDM, elogind, TLP, thermald,
+- System (root Shepherd): NetworkManager, LightDM, elogind, TLP, thermald,
   uinput module, udev rules for kmonad and brightnessctl.
 - Home (user Shepherd, =herd status=): kmonad, syncthing, pipewire,
   wireplumber, dbus.
-- Emacs: EXWM is the window manager, started from the "EXWM" GDM session.
+- Emacs: EXWM is the window manager, started from the "EXWM" LightDM session.
 
 Claude Code is the only tool that does not come from Guix (npm, see below).
 
@@ -136,7 +136,7 @@ If it stops on an unknown package (packages get renamed upstream),
 Dropping one only costs that feature; =use-package= logs the error and
 Emacs keeps starting.
 
-Log out; in GDM pick the *EXWM* session (gear icon), log in.
+Log out; in LightDM pick the *EXWM* session (top-right menu), log in.
 
 ** 7. After first login
 #+begin_src sh

@@ -7,7 +7,7 @@
 (use-modules (gnu)
              (nongnu packages linux)
              (nongnu system linux-initrd))
-(use-service-modules desktop linux pm shepherd xorg)
+(use-service-modules desktop lightdm linux pm shepherd xorg)
 (use-package-modules emacs-xyz haskell-apps linux vpn)
 
 (define %user "george")                 ;CHECK
@@ -84,7 +84,7 @@
                  '("wheel" "netdev" "audio" "video" "input" "uinput")))
                %base-user-accounts))
 
-  ;; emacs-exwm installs the "EXWM" session that GDM offers.
+  ;; emacs-exwm installs the "EXWM" session that LightDM offers.
   (packages (cons* emacs-exwm amneziawg-tools %base-packages))
 
   (services
@@ -106,10 +106,15 @@
           (udev-rules-service 'brightnessctl brightnessctl)
           (simple-service 'amneziawg shepherd-root-service-type
                           (list %amneziawg-service))
-          (set-xorg-configuration
-           (xorg-configuration
-            (keyboard-layout %keyboard-layout))))
+          ;; Not GDM: GDM 49 aborts on Guix ("pick_username: code
+          ;; should not be reached") and leaves the console dead.
+          (service lightdm-service-type
+                   (lightdm-configuration
+                    (xorg-configuration
+                     (xorg-configuration
+                      (keyboard-layout %keyboard-layout))))))
     (modify-services %desktop-services
+      (delete gdm-service-type)
       (guix-service-type
        config => (guix-configuration
                   (inherit config)
