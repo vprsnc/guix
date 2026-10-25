@@ -118,6 +118,10 @@ few packages Guix does not have.
 (use-package doric-themes)
 (use-package ef-themes)
 #+end_src
+*** load theme
+#+begin_src emacs-lisp
+(load-theme 'doric-light t)
+#+end_src
 ** guix
 #+begin_src emacs-lisp
 (use-package geiser-guile)
