@@ -335,7 +335,8 @@ EXWM has no status bar, so show charge in the mode-line.
 
 *** org table font
 #+begin_src emacs-lisp
-(set-face-font 'org-table "Noto Sans Mono")
+(with-eval-after-load 'org
+  (set-face-font 'org-table "Noto Sans Mono"))
 #+end_src
 
 Those are at the end not to break any of the prev settings
