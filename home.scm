@@ -21,6 +21,9 @@
 
 (define %emacs-packages
   '("emacs"
+    ;; also in system.scm (for the LightDM session), but ~/.exwm can only
+    ;; (require 'exwm) if it is on the home profile's EMACSLOADPATH
+    "emacs-exwm"
     ;; ui
     "emacs-modus-themes" "emacs-ef-themes" "emacs-doric-themes"
     "emacs-mood-line" "emacs-all-the-icons"   ;breadcrumb: :vc
