@@ -339,6 +339,19 @@ EXWM has no status bar, so show charge in the mode-line.
      '(org-level-3 ((t (:foreground "#98be65" :height 1.15)))))
   )
 #+end_src
+*** templates
+=C-c C-'= or =<el TAB= (org-tempo) inserts a block.
+#+begin_src emacs-lisp
+(with-eval-after-load 'org
+  (require 'org-tempo)
+  (dolist (template
+           '(("sh" . "src shell")
+             ("py" . "src python :results output")
+             ("R" . "src R :session mysession :results output")
+             ("el" . "src emacs-lisp")
+             ("clj" . "src clojure")))
+    (add-to-list 'org-structure-template-alist template)))
+#+end_src
 *** superstar
 #+begin_src emacs-lisp
 (use-package org-superstar
