@@ -288,6 +288,6 @@ block in place first.
 - Added =(require 'general)= before the keybindings, Guix-built
   =pdf-tools=, deferred =mu4e=, =epg-pinentry-mode 'loopback= for pass.
 - =treesit-auto= no longer compiles grammars; they come from Guix.
-- =cyrillic-dvorak.el= loads only if present. Put it in =emacs/= and
-  uncomment its line in =home.scm=.
+- =cyrillic-dvorak.el= lives in =emacs/= and is the default input
+  method: =C-\= toggles Russian.
 - New =* exwm= section → =~/.exwm=.

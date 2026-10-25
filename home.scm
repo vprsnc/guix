@@ -163,7 +163,7 @@ SyncState *
    (service home-xdg-configuration-files-service-type
             `(("emacs/early-init.el" ,(file-append %emacs-config "/early-init.el"))
               ("emacs/init.el" ,(file-append %emacs-config "/init.el"))
-              ;; ("emacs/cyrillic-dvorak.el" ,(local-file "emacs/cyrillic-dvorak.el"))
+              ("emacs/cyrillic-dvorak.el" ,(local-file "emacs/cyrillic-dvorak.el"))
               ("mpv/mpv.conf" ,(plain-file "mpv.conf" "\
 hwdec=auto
 save-position-on-quit=yes

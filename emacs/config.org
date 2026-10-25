@@ -101,7 +101,8 @@ few packages Guix does not have.
 #+begin_src emacs-lisp
 (let ((file (locate-user-emacs-file "cyrillic-dvorak.el")))
   (when (file-exists-p file)
-    (load-file file)))
+    (load-file file)
+    (setq default-input-method "cyrillic-dvorak")))  ; C-\ toggles it
 #+end_src
 
 * packages
