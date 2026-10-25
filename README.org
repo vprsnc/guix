@@ -229,22 +229,43 @@ cached (8 h cache). All gpg prompts go through =pinentry-emacs=, so
 pass, mbsync and git ask in the minibuffer too; on a bare TTY (no
 Emacs) they ask in the terminal.
 
-* EXWM keys
-| Key            | Action                                 |
-|----------------+----------------------------------------|
-| =s-0= … =s-9=      | Go to workspace N                      |
-| =s-w=            | Pick workspace                         |
-| =s-&=            | Run a program (e.g. =qutebrowser=, =mpv=)  |
-| =s-R=            | Reset EXWM (back to line mode)         |
-| =C-c C-q=        | Next key goes straight to the X window |
-| Volume/bright. | Laptop function keys                   |
+* Working in EXWM
+EXWM makes Emacs the window manager: every X program (qutebrowser, mpv)
+opens as an Emacs buffer, so the usual Emacs commands manage windows.
+
+- Start a program: =s-&=, type its name (=qutebrowser=, =mpv file=).
+- Switch between programs: =C-x b=, like any buffer. Close one: =C-x k=.
+- Split the screen: =C-x 2= / =C-x 3=, move with =C-x o=, unsplit =C-x 1=.
+- Workspaces are separate screens: =s-1= … =s-9= go to one (created on
+  demand), =s-w= picks from a list. =C-x b= shows buffers of all of them.
+
+An X window takes keys in one of two modes:
+- *Line mode* (default): Emacs keys (=C-x=, =M-x=, =C-c=, =s-…=) stay with
+  Emacs, everything else goes to the program. Emacs movement keys are
+  translated: =C-n/p/f/b=, =C-a/e=, =C-k=, =C-s= find, =M-w= copy,
+  =C-y= paste.
+- *Char mode* (=C-c C-k=): every key goes to the program, for apps that
+  need =C-x= or =C-c= themselves. =s-R= brings it back to line mode.
+
+| Key            | Action                                      |
+|----------------+---------------------------------------------|
+| =s-&=            | Run a program                               |
+| =s-0= … =s-9=      | Go to workspace N                           |
+| =s-w=            | Pick workspace                              |
+| =s-R=            | Reset EXWM, window back to line mode        |
+| =C-c C-k=        | Char mode (all keys to the window)          |
+| =C-c C-q=        | Send just the next key to the window        |
+| =C-c C-f=        | Fullscreen toggle                           |
+| =C-c C-t C-f=    | Floating window toggle                      |
+| =C-\=           | Input method, also inside X programs        |
+| Volume/bright. | Laptop function keys                        |
 Super is the =s= home-row hold (kmonad).
 
 * Day to day
 | Task                                      | Command                                                                              |
 |-------------------------------------------+--------------------------------------------------------------------------------------|
-| Change Emacs config / packages / dotfiles | edit, then =guix home reconfigure ~/dotfiles/home.scm=                                 |
-| Change system                             | =sudo guix system reconfigure ~/dotfiles/system.scm=                                   |
+| Change Emacs config / packages / dotfiles | edit =~/dotfiles/emacs/config.org= or =home.scm=, then =sh ~/dotfiles/h.sh=           |
+| Change system                             | edit =~/dotfiles/system.scm=, then =sh ~/dotfiles/u.sh=                               |
 | Update everything                         | =guix pull=, then both reconfigures                                                    |
 | Undo a bad change                         | =guix home roll-back= / =sudo guix system roll-back= (or older GRUB entry)               |
 | Restart a user daemon                     | =herd restart kmonad=                                                                  |
@@ -252,7 +273,8 @@ Super is the =s= home-row hold (kmonad).
 | Try a package without installing          | =guix shell foo=                                                                       |
 
 Emacs config is tangled by Guix, so edits to =emacs/config.org= take
-effect only after =guix home reconfigure=. To test quickly, eval the
+effect only after =h.sh= (=guix home reconfigure=). Never edit
+=~/.config/emacs/init.el=: it is read-only and replaced each time. To test quickly, eval the
 block in place first.
 
 * Things I changed in the Emacs config

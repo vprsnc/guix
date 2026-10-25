@@ -72,6 +72,12 @@ fetched with =use-package :vc=.
 (setq scroll-conservatively 101)
 #+end_src
 
+** font
+Height is in 1/10 pt. =C-x C-+= / =C-x C--= zoom one buffer for now.
+#+begin_src emacs-lisp
+(set-face-attribute 'default nil :family "Fira Code" :height 140)
+#+end_src
+
 ** color emojis
 #+begin_src emacs-lisp
 (set-fontset-font t 'emoji "Noto Color Emoji" nil 'prepend)
@@ -747,9 +753,11 @@ PLACEHOLDER: replace =YOU@riseup.net= / =YOUR NAME= here and
  (use-package pinyin-convert
   :vc (:url "https://github.com/tprost/pinyin-convert.el"
        :ignored-files ("features" "test" "run-tests.sh")))
+ ;; Loaded on first use, not with org: it pulls in jieba, and a jieba
+ ;; failure would then stop org-mode from starting.
  (use-package zh-utils
   :vc (:url "https://codeberg.org/jiewawa/zh-utils")
-  :after ol)
+  :commands (zh-utils-tonify-word zh-utils--chinese-word-p))
 #+end_src
 
 *** tone colors
