@@ -470,8 +470,12 @@ Those are at the end not to break any of the prev settings
 (use-package treesit-auto
   :custom
   (treesit-auto-install nil)  ; grammars come from Guix tree-sitter-* packages
+  ;; Only languages with a grammar in home.scm. 'all added a (nil
+  ;; . php-ts-mode) entry to auto-mode-alist, which broke opening any
+  ;; file not matched earlier (org files: "stringp nil").
+  (treesit-auto-langs '(bash python json html css javascript markdown r))
   :config
-  (treesit-auto-add-to-auto-mode-alist 'all)
+  (treesit-auto-add-to-auto-mode-alist treesit-auto-langs)
   (global-treesit-auto-mode))
 #+end_src
 
