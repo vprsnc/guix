@@ -10,11 +10,11 @@
 (use-service-modules desktop lightdm linux pm shepherd xorg)
 (use-package-modules emacs-xyz haskell-apps linux vpn)
 
-(define %user "george")                 ;CHECK
+(define %user "george")
 
 ;; Applies to the console, GRUB (LUKS passphrase!) and X.
 (define %keyboard-layout
-  (keyboard-layout "us" "dvorak"))      ;CHECK
+  (keyboard-layout "us" "dvorak"))
 
 ;; AmneziaWG tunnel, userspace (amneziawg-go). The config holds the
 ;; private key, so it lives outside the repo and the store:
@@ -41,9 +41,8 @@
   (initrd microcode-initrd)
   (firmware (list linux-firmware))
 
-  ;; Copy these three from the installer's /etc/config.scm.
-  (host-name "x1")
-  (timezone "Europe/Nicosia")
+  (host-name "guiX1")
+  (timezone "Europe/Sofia")
   (locale "en_US.utf8")
   (keyboard-layout %keyboard-layout)
 
@@ -52,11 +51,9 @@
                (targets '("/boot/efi"))
                (keyboard-layout %keyboard-layout)))
 
-  ;; REPLACE: copy mapped-devices, file-systems and swap-devices
-  ;; verbatim from the installer's /etc/config.scm.
   (mapped-devices
    (list (mapped-device
-          (source (uuid "00000000-0000-0000-0000-000000000000"))
+          (source (uuid "c15f1a50-a24f-44c8-94d4-d17ac9c88f5b"))
           (target "cryptroot")
           (type luks-device-mapping))))
 
@@ -68,7 +65,7 @@
             (dependencies mapped-devices))
           (file-system
             (mount-point "/boot/efi")
-            (device (uuid "0000-0000" 'fat32))
+            (device (uuid "B146-3DF4" 'fat32))
             (type "vfat"))
           %base-file-systems))
 
