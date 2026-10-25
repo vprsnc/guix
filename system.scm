@@ -109,7 +109,16 @@
                    (lightdm-configuration
                     (xorg-configuration
                      (xorg-configuration
-                      (keyboard-layout %keyboard-layout))))))
+                      (keyboard-layout %keyboard-layout)
+                      ;; Slower touchpad and TrackPoint: -1 (slowest)
+                      ;; to 1, 0 is the libinput default.
+                      (extra-config
+                       '("Section \"InputClass\"
+  Identifier \"slower pointer\"
+  MatchIsPointer \"on\"
+  Driver \"libinput\"
+  Option \"AccelSpeed\" \"-0.5\"
+EndSection")))))))
     (modify-services %desktop-services
       (delete gdm-service-type)
       (guix-service-type
