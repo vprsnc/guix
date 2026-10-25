@@ -125,6 +125,21 @@ few packages Guix does not have.
   :after geiser-guile
   :bind ("C-x p u" . guix))
 #+end_src
+** shepherd services
+=M-x daemons= lists your own services (kmonad, syncthing) from =herd=;
+=M-x my/daemons-system= the system ones, as root via TRAMP sudo. In the
+list: =RET= status, =s= start, =S= stop, =R= restart, =g= refresh.
+#+begin_src emacs-lisp
+(use-package daemons
+  :commands daemons)
+
+(defun my/daemons-system ()
+  "Manage system Shepherd services as root."
+  (interactive)
+  (require 'daemons)
+  (let ((daemons-always-sudo t))
+    (daemons)))
+#+end_src
 ** envrc
 envrc.el lets direnv set each Emacs buffer's PATH and environment from the project's .envrc, so
 commands started from a project buffer (including cider-jack-in) use the Guix JDK 21 and clj instead    of whatever Emacs got from your login shell at startup.

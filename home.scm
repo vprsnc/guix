@@ -42,7 +42,7 @@
     "emacs-org-roam" "emacs-org-pomodoro" "emacs-denote"
     "emacs-denote-journal"
     ;; guix
-    "emacs-guix" "emacs-geiser" "emacs-geiser-guile"
+    "emacs-guix" "emacs-daemons" "emacs-geiser" "emacs-geiser-guile"
     ;; dev
     "emacs-ess" "emacs-polymode" "emacs-poly-r" "emacs-polymode-markdown"
     "emacs-markdown-mode" "emacs-clojure-mode" "emacs-cider"
