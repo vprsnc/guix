@@ -67,7 +67,7 @@
     ;; clojure; babashka, clj-kondo and clojure-lsp come from nonguix
     "openjdk:jdk" "clojure-tools" "babashka" "clj-kondo" "clojure-lsp"
     "ripgrep" "fd" "direnv" "password-store" "gnupg" "isync"
-    "wireplumber" "brightnessctl"
+    "wireplumber" "brightnessctl" "xinput"
     "font-fira-code" "font-google-noto" "font-google-noto-sans-cjk"
     "font-google-noto-emoji"))
 

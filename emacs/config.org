@@ -1473,6 +1473,23 @@ the page/file title for the browser and mpv.
               (exwm-workspace-rename-buffer exwm-title))))
 #+end_src
 
+** pointer speed
+Slower touchpad and TrackPoint: libinput accel speed from -1 (slowest)
+to 1, 0 is the default. Runs once when EXWM starts.
+#+begin_src emacs-lisp :tangle exwm.el
+(defvar my/pointer-speed "-0.5")
+
+(defun my/set-pointer-speed ()
+  (interactive)
+  (start-process-shell-command
+   "pointer-speed" nil
+   (concat "for d in $(xinput list --id-only); do "
+           "xinput set-prop $d 'libinput Accel Speed' " my/pointer-speed
+           " 2>/dev/null; done")))
+
+(add-hook 'exwm-init-hook #'my/set-pointer-speed)
+#+end_src
+
 ** global keys
 Super comes from the kmonad home-row mod on =s=. =s-r= stays with crux,
 so reset is on =s-R=.
