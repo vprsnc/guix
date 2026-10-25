@@ -743,8 +743,10 @@ PLACEHOLDER: replace =YOU@riseup.net= / =YOUR NAME= here and
   :vc (:url "https://github.com/xuchunyang/cc-cedict.el")
   :init
   (setq cc-cedict-file (expand-file-name "cedict_ts.u8" user-emacs-directory)))
+ ;; features/ and test/ need ecukes/espuds and break byte-compiling.
  (use-package pinyin-convert
-  :vc (:url "https://github.com/tprost/pinyin-convert.el"))
+  :vc (:url "https://github.com/tprost/pinyin-convert.el"
+       :ignored-files ("features" "test" "run-tests.sh")))
  (use-package zh-utils
   :vc (:url "https://codeberg.org/jiewawa/zh-utils")
   :after ol)

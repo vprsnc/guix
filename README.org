@@ -168,7 +168,7 @@ tail ~/.local/state/log/kmonad.log
   Chinese tools). Ghostel downloads its
   pre-built native module on first =M-x ghostel= into
   =~/.config/emacs/ghostel/=. =jieba= needs a Rust dynamic
-  module; if it fails, =guix shell rust rust-cargo= and build it, or drop it.
+  module; =home.scm= ships rust and cargo, so it builds on first load.
 
 * VPN (AmneziaWG)
 No Amnezia GUI on Guix; the tunnel runs with =awg-quick= +
