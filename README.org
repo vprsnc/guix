@@ -58,8 +58,8 @@ it loads the whole ISO into RAM, which is fine with 8 GB.
 
 ** 2. Graphical installer
 - Keyboard: the layout you'll type the disk passphrase with.
-- Partitioning: guided, whole disk, *encrypted*. Make sure you get swap
-  (≥ 4 GB): =guix pull= on 8 GB RAM can run out of memory without it.
+- Partitioning: guided, whole disk, *encrypted*. It makes no swap;
+  =system.scm= uses a swap file instead (see step 5).
 - Desktop environment: *none*.
 - Network service: NetworkManager.
 - On the "Configuration file" page press *Edit*. The installer only
@@ -117,9 +117,17 @@ Without this, Guix compiles the Linux kernel locally (hours).
 ** 5. System
 Open =/etc/config.scm= (written by the installer) next to =system.scm=
 and copy into =system.scm=:
-- =mapped-devices=, =file-systems=, =swap-devices= (verbatim)
+- the LUKS and EFI UUIDs (=%cryptroot=, =/boot/efi=)
 - =host-name=, =timezone=, =locale=
-Then check the two =;CHECK= lines (user name, keyboard layout).
+
+Swap file for hibernation (16 GiB on 8 GB RAM), made once by hand:
+#+begin_src sh
+sudo fallocate -l 16G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo filefrag -v /swapfile | head -4   # first physical_offset
+#+end_src
+Put that offset into =resume_offset= in =system.scm=.
 
 #+begin_src sh
 sudo guix system reconfigure ~/dotfiles/system.scm   # sudo keeps your pulled guix
@@ -286,6 +294,7 @@ before =guix pull= or a reconfigure.
 | Change Emacs config / packages / dotfiles | edit =~/dotfiles/emacs/config.org= or =home.scm=, then =guix home reconfigure ~/dotfiles/home.scm= |
 | Change system                             | edit =~/dotfiles/system.scm=, then =sudo guix system reconfigure ~/dotfiles/system.scm= |
 | Update everything                         | =guix pull=, then both reconfigures                                                    |
+| Suspend / hibernate                       | =loginctl suspend= / =loginctl hibernate= (lid close suspends)                        |
 | VPN up / down                             | =sudo herd start amneziawg= / =sudo herd stop amneziawg=                               |
 | Undo a bad change                         | =guix home roll-back= / =sudo guix system roll-back= (or older GRUB entry)               |
 | Restart a user daemon                     | =herd restart kmonad=                                                                  |
