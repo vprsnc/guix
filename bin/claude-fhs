@@ -1,8 +1,12 @@
 #!/bin/sh
 # npm's claude is a prebuilt binary that wants /lib64/ld-linux-x86-64.so.2;
 # run it in an FHS container that shares $HOME and the network.
+# claude-code-ide passes the Emacs port and IDE flags in the environment,
+# which --container clears, so keep those.
 exec guix shell --container --emulate-fhs --network \
-     --share="$HOME" --preserve='^TERM$' --preserve='^COLORTERM$' \
+     --share="$HOME" \
+     --preserve='^(TERM|COLORTERM|TERM_PROGRAM)$' \
+     --preserve='^(CLAUDE_CODE_|ENABLE_IDE_INTEGRATION$|FORCE_CODE_TERMINAL$|ANTHROPIC_)' \
      bash coreutils grep sed findutils diffutils which curl git ripgrep \
      node nss-certs \
      -- "$HOME/.local/bin/claude" "$@"
