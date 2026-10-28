@@ -262,18 +262,22 @@ An X window takes keys in one of two modes:
 Super is the =s= home-row hold (kmonad).
 
 * Day to day
+substitutes.nonguix.org stalls without VPN here: bring =amneziawg= up
+before =guix pull= or a reconfigure.
+
 | Task                                      | Command                                                                              |
 |-------------------------------------------+--------------------------------------------------------------------------------------|
-| Change Emacs config / packages / dotfiles | edit =~/dotfiles/emacs/config.org= or =home.scm=, then =sh ~/dotfiles/h.sh=           |
-| Change system                             | edit =~/dotfiles/system.scm=, then =sh ~/dotfiles/u.sh=                               |
+| Change Emacs config / packages / dotfiles | edit =~/dotfiles/emacs/config.org= or =home.scm=, then =guix home reconfigure ~/dotfiles/home.scm= |
+| Change system                             | edit =~/dotfiles/system.scm=, then =sudo guix system reconfigure ~/dotfiles/system.scm= |
 | Update everything                         | =guix pull=, then both reconfigures                                                    |
+| VPN up / down                             | =sudo herd start amneziawg= / =sudo herd stop amneziawg=                               |
 | Undo a bad change                         | =guix home roll-back= / =sudo guix system roll-back= (or older GRUB entry)               |
 | Restart a user daemon                     | =herd restart kmonad=                                                                  |
 | Free disk                                 | =guix home delete-generations 1m && sudo guix system delete-generations 1m && guix gc= |
 | Try a package without installing          | =guix shell foo=                                                                       |
 
 Emacs config is tangled by Guix, so edits to =emacs/config.org= take
-effect only after =h.sh= (=guix home reconfigure=). Never edit
+effect only after =guix home reconfigure=. Never edit
 =~/.config/emacs/init.el=: it is read-only and replaced each time. To test quickly, eval the
 block in place first.
 
