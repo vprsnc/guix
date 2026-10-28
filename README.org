@@ -174,16 +174,35 @@ tail ~/.local/state/log/kmonad.log
 No Amnezia GUI on Guix; the tunnel runs with =awg-quick= +
 =amneziawg-go= as a system Shepherd service (=system.scm=).
 
-1. In the Amnezia app (on CachyOS): share the server connection as an
-   *AmneziaWG native config* and save it as =awg0.conf=.
-2. On the X1 (the file holds the private key, so keep it out of this repo):
+1. In the Amnezia app (on CachyOS), share the server connection and
+   save it as =awg0.vpn=. The app saves a =vpn://= link, not a config
+   =awg-quick= can read. Convert it (still on CachyOS):
    #+begin_src sh
-   sudo install -Dm600 awg0.conf /etc/amnezia/amneziawg/awg0.conf
+   python3 - awg0.vpn awg0.conf <<'PY'
+   import base64, json, os, sys, zlib
+   s = open(sys.argv[1]).read().strip().removeprefix('vpn://')
+   j = json.loads(zlib.decompress(base64.urlsafe_b64decode(s + '=' * (-len(s) % 4))[4:]))
+   conf = json.loads(j['containers'][0]['awg']['last_config'])['config']
+   conf = conf.replace('$PRIMARY_DNS', j['dns1']).replace('$SECONDARY_DNS', j['dns2'])
+   fd = os.open(sys.argv[2], os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+   os.write(fd, conf.encode())
+   PY
    #+end_src
+   =awg0.conf= should start with =[Interface]=.
+2. Copy it to the X1 and install it. It holds the private key, so keep
+   it out of this repo and delete the copies afterwards:
+   #+begin_src sh
+   guix shell openssh -- scp george@CACHYOS-IP:awg0.conf .
+   sudo install -Dm600 awg0.conf /etc/amnezia/amneziawg/awg0.conf
+   rm awg0.conf
+   #+end_src
+   (CachyOS needs sshd running and port 22 open to the LAN for the
+   copy; close both again after.)
 3. Use it:
    #+begin_src sh
    sudo herd start amneziawg     # up
    sudo awg show                 # handshake / traffic
+   curl ip.me                    # should print the server's IP
    sudo herd stop amneziawg      # down
    #+end_src
 
