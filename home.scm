@@ -69,7 +69,7 @@
     "uv" "python" "node"                ;node: Claude Code and squint (npm)
     ;; clojure; babashka, clj-kondo and clojure-lsp come from nonguix
     "openjdk:jdk" "clojure-tools" "babashka" "clj-kondo" "clojure-lsp"
-    "ripgrep" "fd" "direnv" "password-store" "gnupg" "isync"
+    "curl" "ripgrep" "fd" "direnv" "password-store" "gnupg" "isync"
     "rust" "rust:cargo" "gcc-toolchain"  ;jieba builds its module with cargo
     "wireplumber" "brightnessctl" "xinput"
     "font-fira-code" "font-google-noto" "font-google-noto-sans-cjk"
