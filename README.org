@@ -9,6 +9,7 @@
 | =home.scm=            | Packages, dotfiles, user daemons (Shepherd)             |
 | =emacs/config.org=    | Emacs config; tangled by Guix into init/early-init/exwm |
 | =kmonad/thinkpad.kbd= | Home-row mods, run by a Home Shepherd service           |
+| =bin/claude-fhs=      | Runs npm's claude in an FHS container                 |
 
 What runs where:
 - System (root Shepherd): NetworkManager, LightDM, elogind, TLP, thermald,
@@ -149,16 +150,12 @@ tail ~/.local/state/log/kmonad.log
 - Claude Code:
   #+begin_src sh
   npm install -g @anthropic-ai/claude-code
-  claude
+  claude-fhs
   #+end_src
-  If the installed =claude= is a prebuilt native binary that fails with
-  "No such file or directory" (it wants =/lib64/ld-linux-x86-64.so.2=),
-  run it in an FHS container instead:
-  #+begin_src sh
-  guix shell --container --emulate-fhs --network \
-    --share=$HOME --preserve='^TERM$' \
-    node bash coreutils git ripgrep -- claude
-  #+end_src
+  npm's =claude= is a prebuilt binary that wants
+  =/lib64/ld-linux-x86-64.so.2=, which Guix doesn't have, so
+  =claude-fhs= (=bin/claude-fhs=, installed by =home.scm=) runs it in
+  an FHS container. claude-code-ide uses it too.
 - squint (ClojureScript → JS), also from npm:
   #+begin_src sh
   npm install -g squint-cljs

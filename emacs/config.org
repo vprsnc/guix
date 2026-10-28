@@ -740,6 +740,7 @@ PLACEHOLDER: replace =YOU@riseup.net= / =YOUR NAME= here and
   :bind ("C-c C-'" . claude-code-ide-menu)
   :custom
   (claude-code-ide-terminal-backend 'ghostel)
+  (claude-code-ide-cli-path "claude-fhs")  ;bin/claude-fhs in home.scm
   :config
   (claude-code-ide-emacs-tools-setup)
   )

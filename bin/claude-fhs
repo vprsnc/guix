@@ -1,0 +1,8 @@
+#!/bin/sh
+# npm's claude is a prebuilt binary that wants /lib64/ld-linux-x86-64.so.2;
+# run it in an FHS container that shares $HOME and the network.
+exec guix shell --container --emulate-fhs --network \
+     --share="$HOME" --preserve='^TERM$' --preserve='^COLORTERM$' \
+     bash coreutils grep sed findutils diffutils which curl git ripgrep \
+     node nss-certs \
+     -- "$HOME/.local/bin/claude" "$@"

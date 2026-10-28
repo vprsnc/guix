@@ -178,6 +178,8 @@ save-position-on-quit=yes
 
    (service home-files-service-type
             `((".exwm" ,(file-append %emacs-config "/exwm.el"))
+              (".local/bin/claude-fhs"
+               ,(local-file "bin/claude-fhs" #:recursive? #t))
               (".mbsyncrc" ,%mbsyncrc)))
 
    ;; Every passphrase prompt (pass, mbsync, git, gpg in a shell) goes to
