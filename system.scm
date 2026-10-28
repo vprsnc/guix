@@ -36,6 +36,20 @@
                       "down" #$%awg-config)
              #f))))
 
+(define %cryptroot
+  (mapped-device
+   (source (uuid "c15f1a50-a24f-44c8-94d4-d17ac9c88f5b"))
+   (target "cryptroot")
+   (type luks-device-mapping)))
+
+;; Named so the swap file can depend on it.
+(define %root-fs
+  (file-system
+    (mount-point "/")
+    (device "/dev/mapper/cryptroot")
+    (type "ext4")
+    (dependencies (list %cryptroot))))
+
 (operating-system
   (kernel linux)
   (initrd microcode-initrd)
@@ -46,28 +60,33 @@
   (locale "en_US.utf8")
   (keyboard-layout %keyboard-layout)
 
+  ;; Hibernate to /swapfile. The offset is its first physical block:
+  ;;   sudo filefrag -v /swapfile | head -4   (physical_offset)
+  ;; Recreating the file changes it.
+  (kernel-arguments
+   (cons* "resume=/dev/mapper/cryptroot" "resume_offset=58327040"
+          %default-kernel-arguments))
+
   (bootloader (bootloader-configuration
                (bootloader grub-efi-bootloader)
                (targets '("/boot/efi"))
                (keyboard-layout %keyboard-layout)))
 
-  (mapped-devices
-   (list (mapped-device
-          (source (uuid "c15f1a50-a24f-44c8-94d4-d17ac9c88f5b"))
-          (target "cryptroot")
-          (type luks-device-mapping))))
+  (mapped-devices (list %cryptroot))
 
   (file-systems
-   (cons* (file-system
-            (mount-point "/")
-            (device "/dev/mapper/cryptroot")
-            (type "ext4")
-            (dependencies mapped-devices))
+   (cons* %root-fs
           (file-system
             (mount-point "/boot/efi")
             (device (uuid "B146-3DF4" 'fat32))
             (type "vfat"))
           %base-file-systems))
+
+  ;; 16 GiB, made once by hand (fallocate, chmod 600, mkswap).
+  (swap-devices
+   (list (swap-space
+           (target "/swapfile")
+           (dependencies (list %root-fs)))))
 
   ;; kmonad reads /dev/input (input) and writes /dev/uinput (uinput).
   (groups (cons (user-group (name "uinput") (system? #t))
