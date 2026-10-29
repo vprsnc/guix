@@ -214,6 +214,33 @@ No Amnezia GUI on Guix; the tunnel runs with =awg-quick= +
 It isn't started at boot. If the config has a =DNS= line, =awg-quick=
 sets it via resolvconf; NetworkManager may overwrite it on reconnect.
 
+* Passwords (pass)
+The store is a private git repo, =git@gitlab.com:vprsnc/password-store.git=,
+encrypted to one GPG key per machine (listed in =.gpg-id=). To add a
+machine:
+
+1. On it, make a GPG key and an SSH key, and export the public GPG key:
+   #+begin_src sh
+   gpg --quick-gen-key "NAME <MAIL>" future-default default never
+   gpg --armor --export MAIL > new.asc
+   ssh-keygen -t ed25519
+   #+end_src
+2. On a machine that can already decrypt, re-encrypt to the new key
+   (pass commits it):
+   #+begin_src sh
+   gpg --import new.asc
+   gpg --quick-lsign-key FINGERPRINT
+   pass init $(cat ~/.password-store/.gpg-id) FINGERPRINT
+   pass git push
+   #+end_src
+3. Add =~/.ssh/id_ed25519.pub= to GitLab (Preferences → SSH Keys), then
+   on the new machine:
+   #+begin_src sh
+   git clone git@gitlab.com:vprsnc/password-store.git ~/.password-store
+   #+end_src
+
+After that, =pass git pull= / =pass git push= keep the machines in step.
+
 * Mail (mu4e)
 Fetch = =mbsync= started by mu4e's timer (every 10 min), send = Emacs
 =smtpmail=, password = pass via =auth-source-pass=. No mail daemons.
@@ -222,10 +249,9 @@ Once the new Riseup account exists:
 1. Replace the placeholders: =%mail-address= in =home.scm=;
    =my/mail-address= and =YOUR NAME= in =emacs/config.org= (mu4e section).
    Then =guix home reconfigure ~/dotfiles/home.scm=.
-2. GPG key + password store (skip the first two if you bring a key):
+2. The password store (private repo, encrypted to every machine's key)
+   and the mail entry:
    #+begin_src sh
-   gpg --full-generate-key
-   pass init YOUR-KEY-ID
    pass insert -m mail.riseup.net
    #+end_src
    Entry content (first line is the password):
